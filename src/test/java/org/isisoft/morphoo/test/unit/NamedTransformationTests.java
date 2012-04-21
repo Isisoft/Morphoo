@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 /**
  * @author Carlos Munoz
  */
-public class NamedTransformationTest extends AbstractTransformationUnitTest
+public class NamedTransformationTests extends AbstractTransformationUnitTest
 {
    @Override
    protected void prepareTransformationFramework()

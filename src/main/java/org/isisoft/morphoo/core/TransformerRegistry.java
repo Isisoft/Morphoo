@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +44,8 @@ class TransformerRegistry
 
    private Collection<Class<?>> registeredClasses;
 
+   private TransformerGraph transformerGraph;
+
    private boolean initialized;
 
 
@@ -57,6 +60,7 @@ class TransformerRegistry
       this.defaultTransformerMap = new HashMap<TransformerKey, Transformer>();
       this.registeredPackages = new HashSet<String>();
       this.registeredClasses = new HashSet<Class<?>>();
+      this.transformerGraph = new TransformerGraph();
       this.initialized = false;
    }
 
@@ -124,6 +128,13 @@ class TransformerRegistry
       }
 
       return null; // did not find a transformer
+   }
+
+   public List<Class<?>> deriveClassTransformationChain(Class<?> from, Class<?> to)
+   {
+      this.initializeIfNotReady();
+
+      return this.transformerGraph.getFastestRouteToTarget(from, to);
    }
 
    private Object[] getReflectionScanHints()
@@ -282,6 +293,9 @@ class TransformerRegistry
       {
          this.defaultTransformerMap.put(new TransformerKey(sourceType, targetType), transformer);
       }
+
+      // Store in the Transformer Graph
+      this.transformerGraph.addTransformerRoute(sourceType, targetType);
    }
 
 
