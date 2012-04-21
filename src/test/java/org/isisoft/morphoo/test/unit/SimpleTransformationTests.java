@@ -1,7 +1,7 @@
 package org.isisoft.morphoo.test.unit;
 
 import org.isisoft.morphoo.core.Morphoo;
-import org.isisoft.morphoo.core.Transform;
+import org.isisoft.morphoo.core.Transformation;
 import org.isisoft.morphoo.test.model.SourceType;
 import org.testng.annotations.Test;
 
@@ -28,7 +28,7 @@ public class SimpleTransformationTests extends AbstractTransformationUnitTest
       SourceType s = new SourceType();
       s.setName("My name is Morphoo!");
 
-      String strVal = Transform.from(s).to(String.class);
+      String strVal = Transformation.from(s).to(String.class);
 
       assertThat(strVal, is(s.getName()));
    }
@@ -39,7 +39,7 @@ public class SimpleTransformationTests extends AbstractTransformationUnitTest
       SourceType s = new SourceType();
       s.setName("My name is Morphoo!");
 
-      int intVal = Transform.from(s).to(int.class);
+      int intVal = Transformation.from(s).to(int.class);
 
       assertThat(intVal, is(s.getValue()));
    }
@@ -51,7 +51,7 @@ public class SimpleTransformationTests extends AbstractTransformationUnitTest
       s.setName("My name is Morphoo!");
       s.setDate(new Date());
 
-      Date dateVal = Transform.from(s).to(Date.class);
+      Date dateVal = Transformation.from(s).to(Date.class);
 
       assertThat(dateVal, is(s.getDate()));
    }
@@ -60,7 +60,7 @@ public class SimpleTransformationTests extends AbstractTransformationUnitTest
    public void transformSimpleStringWithContext()
    {
       String toTransform = "Hello ";
-      String result = Transform.from(toTransform).withContext("additional", "World!").to(String.class);
+      String result = Transformation.from(toTransform).withContext("additional", "World!").to(String.class);
 
       assertThat(result, is("Hello World!"));
    }

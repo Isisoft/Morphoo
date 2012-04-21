@@ -1,6 +1,5 @@
 package org.isisoft.morphoo.core;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,15 +9,15 @@ import java.util.Set;
 /**
  * One of the framework's most important class. It offers ways to customize and perform transformations.
  *
- * To begin a transformation the {@link Transform#from(Object)} method is called. It will initialize a
+ * To begin a transformation the {@link Transformation#from(Object)} method is called. It will initialize a
  * transformation for the given object.
  *
  * A simple transformation may be of the form
- * <code>Transform.from(myObj).to(MyOtherClass.class)</code>
+ * <code>Transformation.from(myObj).to(MyOtherClass.class)</code>
  *
  * @author Carlos Munoz
  */
-public class Transform<T>
+public class Transformation<T>
 {
 
    private T srcObject;
@@ -31,7 +30,7 @@ public class Transform<T>
 
    private boolean deriveTransformation;
 
-   private Transform()
+   private Transformation()
    {
       this.context = new TransformationContext();
       this.transformerChain = new LinkedList<Class<?>>();
@@ -39,11 +38,11 @@ public class Transform<T>
       this.deriveTransformation = false;
    }
 
-   public static final <R> Transform<R> from( R src )
+   public static final <R> Transformation<R> from( R src )
    {
-      Transform<R> transform = new Transform<R>();
-      transform.srcObject = src;
-      return transform;
+      Transformation<R> transformation = new Transformation<R>();
+      transformation.srcObject = src;
+      return transformation;
    }
 
    public final <R> R to( Class<R> targetClass )
@@ -78,7 +77,7 @@ public class Transform<T>
       return (R)this.transform(src, toClass);
    }
 
-   public Transform<T> through( Class<?> intermediateClass )
+   public Transformation<T> through( Class<?> intermediateClass )
    {
       // through cannot be used with derive at the same time
       if( this.deriveTransformation )
@@ -90,19 +89,19 @@ public class Transform<T>
       return this;
    }
 
-   public Transform<T> using(String transformerName)
+   public Transformation<T> using(String transformerName)
    {
       this.transformerNames.add(transformerName);
       return this;
    }
 
-   public Transform<T> withContext(String name, Object ctxVariable)
+   public Transformation<T> withContext(String name, Object ctxVariable)
    {
       this.context.put(name, ctxVariable);
       return this;
    }
 
-   public Transform<T> deriving()
+   public Transformation<T> deriving()
    {
       // Deriving cannot be used with through at the same time
       if( !this.transformerChain.isEmpty() )

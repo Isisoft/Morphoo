@@ -1,7 +1,7 @@
 package org.isisoft.morphoo.test.unit;
 
 import org.isisoft.morphoo.core.Morphoo;
-import org.isisoft.morphoo.core.Transform;
+import org.isisoft.morphoo.core.Transformation;
 import org.isisoft.morphoo.test.model.FinalTargetType;
 import org.isisoft.morphoo.test.model.IntermediateType;
 import org.isisoft.morphoo.test.model.SourceType;
@@ -32,7 +32,7 @@ public class ChainedTransformationTests extends AbstractTransformationUnitTest
       src.setValue(10);
 
       FinalTargetType target =
-         Transform.from(src).through(IntermediateType.class).to(FinalTargetType.class);
+         Transformation.from(src).through(IntermediateType.class).to(FinalTargetType.class);
 
       assertThat(target.getDate(), equalTo(src.getDate()));
    }

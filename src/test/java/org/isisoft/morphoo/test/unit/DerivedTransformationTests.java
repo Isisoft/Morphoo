@@ -1,7 +1,7 @@
 package org.isisoft.morphoo.test.unit;
 
 import org.isisoft.morphoo.core.Morphoo;
-import org.isisoft.morphoo.core.Transform;
+import org.isisoft.morphoo.core.Transformation;
 import org.isisoft.morphoo.core.TransformationException;
 import org.isisoft.morphoo.test.model.FinalTargetType;
 import org.isisoft.morphoo.test.model.IntermediateType;
@@ -33,8 +33,8 @@ public class DerivedTransformationTests extends AbstractTransformationUnitTest
       src.setValue(11);
       src.setName("My name is Morphoo!");
 
-      FinalTargetType finalDerivedType = Transform.from(src).deriving().to(FinalTargetType.class);
-      FinalTargetType finalNonDerivedType = Transform.from(src).through(IntermediateType.class).to(FinalTargetType.class);
+      FinalTargetType finalDerivedType = Transformation.from(src).deriving().to(FinalTargetType.class);
+      FinalTargetType finalNonDerivedType = Transformation.from(src).through(IntermediateType.class).to(FinalTargetType.class);
 
       assertThat(finalDerivedType, equalTo(finalNonDerivedType));
    }
@@ -43,7 +43,7 @@ public class DerivedTransformationTests extends AbstractTransformationUnitTest
          expectedExceptionsMessageRegExp = "Unable to derive transformation chain .*")
    public void derivationNotFound()
    {
-      Transform.from("I am the source").deriving().to(Calendar.class);
+      Transformation.from("I am the source").deriving().to(Calendar.class);
    }
 
 }

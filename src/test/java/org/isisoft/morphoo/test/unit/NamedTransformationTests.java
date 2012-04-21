@@ -1,7 +1,7 @@
 package org.isisoft.morphoo.test.unit;
 
 import org.isisoft.morphoo.core.Morphoo;
-import org.isisoft.morphoo.core.Transform;
+import org.isisoft.morphoo.core.Transformation;
 import org.isisoft.morphoo.test.model.transformer.NamedTransformers;
 import org.testng.annotations.Test;
 
@@ -24,9 +24,9 @@ public class NamedTransformationTests extends AbstractTransformationUnitTest
    {
       String original = "10";
 
-      String plus1 = Transform.from(original).using("STRING-TO-STRING-1").to(String.class);
-      String plus2 = Transform.from(original).using("STRING-TO-STRING-2").to(String.class);
-      String plus3 = Transform.from(original).using("STRING-TO-STRING-3").to(String.class);
+      String plus1 = Transformation.from(original).using("STRING-TO-STRING-1").to(String.class);
+      String plus2 = Transformation.from(original).using("STRING-TO-STRING-2").to(String.class);
+      String plus3 = Transformation.from(original).using("STRING-TO-STRING-3").to(String.class);
 
       assertThat(plus1, is("10+1"));
       assertThat(plus2, is("10+2"));
