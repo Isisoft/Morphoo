@@ -25,6 +25,11 @@ public class TransformationContext
       return contextMap.get(name);
    }
 
+   public <T> T get(String name, Class<T> asClass)
+   {
+      return (T)this.get(name);
+   }
+
    public int size()
    {
       return contextMap.size();
