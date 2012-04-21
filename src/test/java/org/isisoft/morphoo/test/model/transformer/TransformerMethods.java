@@ -5,6 +5,8 @@ import org.isisoft.morphoo.test.model.FinalTargetType;
 import org.isisoft.morphoo.test.model.IntermediateType;
 import org.isisoft.morphoo.test.model.SourceType;
 
+import java.util.Date;
+
 /**
  * @author Carlos Munoz
  */
@@ -20,6 +22,12 @@ public class TransformerMethods
    public int toInteger( SourceType obj )
    {
       return obj.getValue();
+   }
+
+   @Transformer
+   public static Date toDate( SourceType obj )
+   {
+      return obj.getDate();
    }
 
    @Transformer

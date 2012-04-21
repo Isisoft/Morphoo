@@ -5,6 +5,8 @@ import org.isisoft.morphoo.core.Transform;
 import org.isisoft.morphoo.test.model.SourceType;
 import org.testng.annotations.Test;
 
+import java.util.Date;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -40,6 +42,18 @@ public class SimpleTransformationTests extends AbstractTransformationUnitTest
       int intVal = Transform.from(s).to(int.class);
 
       assertThat(intVal, is(s.getValue()));
+   }
+
+   @Test
+   public void transformUsingStatic()
+   {
+      SourceType s = new SourceType();
+      s.setName("My name is Morphoo!");
+      s.setDate(new Date());
+
+      Date dateVal = Transform.from(s).to(Date.class);
+
+      assertThat(dateVal, is(s.getDate()));
    }
 
    @Test
