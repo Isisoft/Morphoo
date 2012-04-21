@@ -23,4 +23,9 @@ public class Morphoo
    {
       TransformerRegistry.getInstance().addScannableClasses(classes);
    }
+
+   public static final void reset()
+   {
+      TransformerRegistry.getInstance().reset();
+   }
 }

@@ -1,6 +1,7 @@
 package org.isisoft.morphoo.core;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.Scanner;
@@ -13,6 +14,7 @@ import org.reflections.util.ConfigurationBuilder;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -45,6 +47,11 @@ class TransformerRegistry
 
 
    protected TransformerRegistry()
+   {
+      this.reset();
+   }
+
+   public void reset()
    {
       this.transformerMap = new HashMap<TransformerKey, Transformer>();
       this.defaultTransformerMap = new HashMap<TransformerKey, Transformer>();
@@ -171,7 +178,21 @@ class TransformerRegistry
 
       while(it.hasNext())
       {
-         if(!this.registeredClasses.contains( it.next().getDeclaringClass() ))
+         Method candidate = it.next();
+
+         boolean packageIsRegistered = false;
+         for( String packageName : this.registeredPackages )
+         {
+            if( candidate.getDeclaringClass().getPackage().getName().startsWith(packageName) )
+            {
+               packageIsRegistered = true;
+               break;
+            }
+         }
+
+         boolean classNameIsRegistered  = this.registeredClasses.contains(candidate.getDeclaringClass());
+
+         if( !classNameIsRegistered && !packageIsRegistered )
          {
             it.remove();
          }

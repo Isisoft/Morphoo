@@ -10,6 +10,9 @@ public abstract class AbstractTransformationUnitTest
    @BeforeClass
    public void configure()
    {
+      // Reset the Morphoo framework
+      Morphoo.reset();
+
       this.prepareTransformationFramework();
    }
 
