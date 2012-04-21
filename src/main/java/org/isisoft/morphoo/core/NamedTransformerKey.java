@@ -1,6 +1,8 @@
 package org.isisoft.morphoo.core;
 
 /**
+ * Extension of the {@link TransformerKey} class that also takes into account the transformer's name.
+ *
  * @author Carlos Munoz
  */
 public class NamedTransformerKey extends TransformerKey

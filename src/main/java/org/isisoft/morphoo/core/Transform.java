@@ -8,6 +8,14 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
+ * One of the framework's most important class. It offers ways to customize and perform transformations.
+ *
+ * To begin a transformation the {@link Transform#from(Object)} method is called. It will initialize a
+ * transformation for the given object.
+ *
+ * A simple transformation may be of the form
+ * <code>Transform.from(myObj).to(MyOtherClass.class)</code>
+ *
  * @author Carlos Munoz
  */
 public class Transform<T>

@@ -3,6 +3,8 @@ package org.isisoft.morphoo.core;
 import java.io.Serializable;
 
 /**
+ * Key class to index transformers by their source and target types.
+ *
  * @author Carlos Munoz
  */
 public class TransformerKey implements Serializable
