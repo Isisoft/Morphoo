@@ -5,6 +5,7 @@ import org.isisoft.morphoo.core.Transformation;
 import org.isisoft.morphoo.test.model.FinalTargetType;
 import org.isisoft.morphoo.test.model.IntermediateType;
 import org.isisoft.morphoo.test.model.SourceType;
+import org.isisoft.morphoo.test.model.transformer.TransformerMethods;
 import org.testng.annotations.Test;
 
 import java.util.Date;
@@ -20,7 +21,7 @@ public class ChainedTransformationTests extends AbstractTransformationUnitTest
    @Override
    protected void prepareTransformationFramework()
    {
-      Morphoo.registerPackages("org.isisoft.morphoo.test");
+      Morphoo.registerClasses(TransformerMethods.class);
    }
 
    @Test
@@ -32,7 +33,7 @@ public class ChainedTransformationTests extends AbstractTransformationUnitTest
       src.setValue(10);
 
       FinalTargetType target =
-         Transformation.from(src).through(IntermediateType.class).to(FinalTargetType.class);
+            Transformation.into(FinalTargetType.class).through(IntermediateType.class).performOn(src);
 
       assertThat(target.getDate(), equalTo(src.getDate()));
    }

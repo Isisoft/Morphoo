@@ -1,20 +1,11 @@
 package org.isisoft.morphoo.core;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.Scanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.scanners.TypeElementsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -225,34 +216,22 @@ class TransformerRegistry
       Class<?> sourceType;
       Class<?> targetType = method.getReturnType();
 
-      // No parameters found on the transformer method
-      if( method.getParameterTypes().length == 0 )
+      Class<?>[] parameterTypes = method.getParameterTypes();
+
+      // return type must not be null
+      if( method.getReturnType() == Void.TYPE || method.getReturnType() == void.class )
       {
          throw new InitializationException("Transformer method " + method.getName() + " on class "
-               + method.getDeclaringClass().getName() + " must have at least one argument" );
+               + method.getDeclaringClass().getName() + " must not return void");
       }
-      // One parameter, first parameter is the source, no context allowed
-      else if( method.getParameterTypes().length == 1 )
-      {
-         sourceType = method.getParameterTypes()[0];
-      }
-      // Two parameters found, the second one must be the Context
-      else if( method.getParameterTypes().length == 2 )
-      {
-         sourceType = method.getParameterTypes()[0];
-         if( method.getParameterTypes()[1] != TransformationContext.class )
-         {
-            throw new InitializationException("Transformer method " + method.getName() + " on class "
-                  + method.getDeclaringClass().getName() + " has a second parameter which is not of type "
-                  + TransformationContext.class.getName() );
-         }
-      }
-      // All other methods cannot be transformers
-      else
+      // Must have at least one argument
+      if( parameterTypes.length == 0 )
       {
          throw new InitializationException("Transformer method " + method.getName() + " on class "
-               + method.getDeclaringClass().getName() + " has an incorrect signature for a Transformer method" );
+               + method.getDeclaringClass().getName() + " must have at least one argument");
       }
+
+      sourceType = parameterTypes[0];
 
       TransformerKey transformerKey;
 
@@ -268,7 +247,7 @@ class TransformerRegistry
       // If another transformer is already registered
       if( this.transformerMap.containsKey( transformerKey ) )
       {
-         Transformer conflictingTransformer = this.transformerMap.get(transformerKey);
+         SimpleTransformer conflictingTransformer = (SimpleTransformer)this.transformerMap.get(transformerKey);
 
          StringBuilder exMssg = new StringBuilder("Two transformer methods with equivalent signatures");
          if( transformerKey instanceof NamedTransformerKey)
@@ -285,7 +264,7 @@ class TransformerRegistry
       }
 
       // Store in the transformer map
-      final Transformer transformer = new Transformer(method);
+      final Transformer transformer = new SimpleTransformer(method);
       this.transformerMap.put(transformerKey, transformer);
 
       // store in the default transformer map if it is marked as such

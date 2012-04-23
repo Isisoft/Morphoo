@@ -3,6 +3,8 @@ package org.isisoft.morphoo.test.unit;
 import org.isisoft.morphoo.core.Morphoo;
 import org.isisoft.morphoo.core.Transformation;
 import org.isisoft.morphoo.test.model.SourceType;
+import org.isisoft.morphoo.test.model.transformer.TransformerMethods;
+import org.isisoft.morphoo.test.model.transformer.TransformerMethodsWithContext;
 import org.testng.annotations.Test;
 
 import java.util.Date;
@@ -19,7 +21,8 @@ public class SimpleTransformationTests extends AbstractTransformationUnitTest
    @Override
    protected void prepareTransformationFramework()
    {
-      Morphoo.registerPackages("org.isisoft.morphoo.test");
+      Morphoo.registerClasses(TransformerMethods.class,
+            TransformerMethodsWithContext.class);
    }
 
    @Test
@@ -28,7 +31,7 @@ public class SimpleTransformationTests extends AbstractTransformationUnitTest
       SourceType s = new SourceType();
       s.setName("My name is Morphoo!");
 
-      String strVal = Transformation.from(s).to(String.class);
+      String strVal = Transformation.into(String.class).performOn(s);
 
       assertThat(strVal, is(s.getName()));
    }
@@ -39,7 +42,7 @@ public class SimpleTransformationTests extends AbstractTransformationUnitTest
       SourceType s = new SourceType();
       s.setName("My name is Morphoo!");
 
-      int intVal = Transformation.from(s).to(int.class);
+      int intVal = Transformation.into(int.class).performOn(s);
 
       assertThat(intVal, is(s.getValue()));
    }
@@ -51,7 +54,7 @@ public class SimpleTransformationTests extends AbstractTransformationUnitTest
       s.setName("My name is Morphoo!");
       s.setDate(new Date());
 
-      Date dateVal = Transformation.from(s).to(Date.class);
+      Date dateVal = Transformation.into(Date.class).performOn(s);
 
       assertThat(dateVal, is(s.getDate()));
    }
@@ -60,7 +63,7 @@ public class SimpleTransformationTests extends AbstractTransformationUnitTest
    public void transformSimpleStringWithContext()
    {
       String toTransform = "Hello ";
-      String result = Transformation.from(toTransform).withContext("additional", "World!").to(String.class);
+      String result = Transformation.into(String.class).withContext("additional", "World!").performOn(toTransform);
 
       assertThat(result, is("Hello World!"));
    }

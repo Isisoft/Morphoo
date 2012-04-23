@@ -6,6 +6,7 @@ import org.isisoft.morphoo.core.TransformationException;
 import org.isisoft.morphoo.test.model.FinalTargetType;
 import org.isisoft.morphoo.test.model.IntermediateType;
 import org.isisoft.morphoo.test.model.SourceType;
+import org.isisoft.morphoo.test.model.transformer.TransformerMethods;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
@@ -22,7 +23,7 @@ public class DerivedTransformationTests extends AbstractTransformationUnitTest
    @Override
    protected void prepareTransformationFramework()
    {
-      Morphoo.registerPackages("org.isisoft.morphoo.test");
+      Morphoo.registerClasses(TransformerMethods.class);
    }
 
    @Test
@@ -33,8 +34,8 @@ public class DerivedTransformationTests extends AbstractTransformationUnitTest
       src.setValue(11);
       src.setName("My name is Morphoo!");
 
-      FinalTargetType finalDerivedType = Transformation.from(src).deriving().to(FinalTargetType.class);
-      FinalTargetType finalNonDerivedType = Transformation.from(src).through(IntermediateType.class).to(FinalTargetType.class);
+      FinalTargetType finalDerivedType = Transformation.into(FinalTargetType.class).deriving().performOn(src);
+      FinalTargetType finalNonDerivedType = Transformation.into(FinalTargetType.class).through(IntermediateType.class).performOn(src);
 
       assertThat(finalDerivedType, equalTo(finalNonDerivedType));
    }
@@ -43,7 +44,7 @@ public class DerivedTransformationTests extends AbstractTransformationUnitTest
          expectedExceptionsMessageRegExp = "Unable to derive transformation chain .*")
    public void derivationNotFound()
    {
-      Transformation.from("I am the source").deriving().to(Calendar.class);
+      Transformation.into(Calendar.class).deriving().performOn("I am the source");
    }
 
 }

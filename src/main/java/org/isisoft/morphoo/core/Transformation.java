@@ -23,7 +23,7 @@ import java.util.Set;
 public class Transformation<T>
 {
 
-   private T srcObject;
+   private Class<T> targetType;
 
    private TransformationContext context;
 
@@ -41,50 +41,32 @@ public class Transformation<T>
       this.deriveTransformation = false;
    }
 
-   /**
-    * Initializes a transformation for a given object.
-    *
-    * @param src The object which will be transformed.
-    * @param <R> The type of the transformation to initialize.
-    * @return A new Transformation instance for the given src object.
-    */
-   public static final <R> Transformation<R> from( R src )
+   public static final <R> Transformation<R> into( Class<R> targetType )
    {
       Transformation<R> transformation = new Transformation<R>();
-      transformation.srcObject = src;
+      transformation.targetType = targetType;
       return transformation;
    }
 
-   /**
-    * Performs and finalizes this transformation.
-    * After calling this method the transformation will be rendered unusable whether it is successful or not.
-    *
-    * @param targetClass The class to transform into.
-    * @param <R> The type that will be returned by this Transformation.
-    * @return The Transformation result.
-    * @throws TransformationException if there is a problem performing the transformation.
-    */
-   public final <R> R to( Class<R> targetClass )
+   public final T performOn( Object src )
    {
-      Object src = this.srcObject;
-      Class<?> toClass;
-
       // If deriving is enabled, build a transformer chain right now
       if(this.deriveTransformation)
       {
          this.transformerChain.clear();
-         List<Class<?>> chain = TransformerRegistry.getInstance().deriveClassTransformationChain(src.getClass(), targetClass);
+         List<Class<?>> chain = TransformerRegistry.getInstance().deriveClassTransformationChain(src.getClass(), this.targetType);
 
          if( chain.isEmpty() )
          {
             throw new TransformationException("Unable to derive transformation chain from " + src.getClass().getName()
-                  + " to " + targetClass );
+                  + " to " + this.targetType.getName() );
          }
 
          this.transformerChain.addAll(chain.subList(0, chain.size()-1)); // Ignore the last element as it will be dealt with below
       }
 
       // perform any chained transformations
+      Class<?> toClass;
       while( !this.transformerChain.isEmpty() )
       {
          toClass = this.transformerChain.poll();
@@ -92,13 +74,13 @@ public class Transformation<T>
       }
 
       // Last transformation
-      toClass = targetClass;
-      return (R)this.transform(src, toClass);
+      toClass = this.targetType;
+      return (T)this.transform(src, toClass);
    }
 
    /**
     * Indicates that this transformation should go through the specified class.
-    * If there is a {@link Transformer} method specified from ClassA to ClassB, and another from ClassB to ClassC.
+    * If there is a {@link SimpleTransformer} method specified from ClassA to ClassB, and another from ClassB to ClassC.
     * The following call:
     * <code>
     *    Transformation.from(new ClassA()).through(ClassB.class).to(ClassC.class)
@@ -127,7 +109,7 @@ public class Transformation<T>
 
    /**
     * Indicates that this Transformation should use a transformer named as transformerName if needed. This is useful to
-    * resolve conflicts when there are multiple {@link Transformer} methods that transform from one type to the other.
+    * resolve conflicts when there are multiple {@link SimpleTransformer} methods that transform from one type to the other.
     *
     * @param transformerName The name of the transformer method to use if any conflicts arise.
     * @return A Transformation instance that will use transformerName to resolve conflicts.
@@ -193,14 +175,19 @@ public class Transformation<T>
     */
    private Object transform( Object src, Class<?> targetClass )
    {
-      Transformer transformer =
-            TransformerRegistry.getInstance().getTransformer(src.getClass(), targetClass);
+      Transformer transformer = null;
 
       // Try to find a named transformer if any names were supplied
-      if( transformer == null && !this.transformerNames.isEmpty() )
+      if( !this.transformerNames.isEmpty() )
       {
          transformer =
                TransformerRegistry.getInstance().getTransformer(src.getClass(), targetClass, this.transformerNames);
+      }
+      // otherwise, find it by default
+      else
+      {
+         transformer =
+            TransformerRegistry.getInstance().getTransformer(src.getClass(), targetClass);
       }
 
       // If still not found then it is not registered

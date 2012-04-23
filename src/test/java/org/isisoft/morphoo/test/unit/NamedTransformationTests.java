@@ -24,9 +24,9 @@ public class NamedTransformationTests extends AbstractTransformationUnitTest
    {
       String original = "10";
 
-      String plus1 = Transformation.from(original).using("STRING-TO-STRING-1").to(String.class);
-      String plus2 = Transformation.from(original).using("STRING-TO-STRING-2").to(String.class);
-      String plus3 = Transformation.from(original).using("STRING-TO-STRING-3").to(String.class);
+      String plus1 = Transformation.into(String.class).using("STRING-TO-STRING-1").performOn(original);
+      String plus2 = Transformation.into(String.class).using("STRING-TO-STRING-2").performOn(original);
+      String plus3 = Transformation.into(String.class).using("STRING-TO-STRING-3").performOn(original);
 
       assertThat(plus1, is("10+1"));
       assertThat(plus2, is("10+2"));
