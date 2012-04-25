@@ -2,7 +2,8 @@ package org.isisoft.morphoo.test.unit;
 
 import org.isisoft.morphoo.core.Morphoo;
 import org.isisoft.morphoo.core.Transformation;
-import org.isisoft.morphoo.test.model.SourceType;
+import org.isisoft.morphoo.test.AbstractTransformationUnitTest;
+import org.isisoft.morphoo.test.model.unit.SourceType;
 import org.isisoft.morphoo.test.model.transformer.TransformerMethods;
 import org.isisoft.morphoo.test.model.transformer.TransformerMethodsWithContext;
 import org.testng.annotations.Test;

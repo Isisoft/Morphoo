@@ -1,9 +1,9 @@
 package org.isisoft.morphoo.test.model.transformer;
 
 import org.isisoft.morphoo.annotation.Transformer;
-import org.isisoft.morphoo.test.model.FinalTargetType;
-import org.isisoft.morphoo.test.model.IntermediateType;
-import org.isisoft.morphoo.test.model.SourceType;
+import org.isisoft.morphoo.test.model.unit.FinalTargetType;
+import org.isisoft.morphoo.test.model.unit.IntermediateType;
+import org.isisoft.morphoo.test.model.unit.SourceType;
 
 import java.util.Date;
 

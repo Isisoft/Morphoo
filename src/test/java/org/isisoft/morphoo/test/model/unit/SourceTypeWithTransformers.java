@@ -1,4 +1,4 @@
-package org.isisoft.morphoo.test.model;
+package org.isisoft.morphoo.test.model.unit;
 
 import org.isisoft.morphoo.annotation.Transformers;
 import org.isisoft.morphoo.test.model.transformer.SourceTypeDeclaredTransformers;

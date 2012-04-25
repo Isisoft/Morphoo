@@ -1,4 +1,4 @@
-package org.isisoft.morphoo.test.model;
+package org.isisoft.morphoo.test.model.unit;
 
 import java.util.Date;
 

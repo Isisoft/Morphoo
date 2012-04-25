@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import static org.isisoft.morphoo.core.TransformerMethod.TransformerMethodArgument;
 
 /**
- * Simple transformer that offers a one-step basic transformation from one type to another.
+ * Simple transformer that offers a one-step unit transformation from one type to another.
  *
  * @author Carlos Munoz
  */

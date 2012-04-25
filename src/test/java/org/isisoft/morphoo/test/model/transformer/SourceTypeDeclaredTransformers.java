@@ -1,7 +1,7 @@
 package org.isisoft.morphoo.test.model.transformer;
 
 import org.isisoft.morphoo.annotation.Transformer;
-import org.isisoft.morphoo.test.model.SourceTypeWithTransformers;
+import org.isisoft.morphoo.test.model.unit.SourceTypeWithTransformers;
 
 import java.util.Date;
 

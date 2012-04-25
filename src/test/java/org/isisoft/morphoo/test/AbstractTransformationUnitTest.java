@@ -1,4 +1,4 @@
-package org.isisoft.morphoo.test.unit;
+package org.isisoft.morphoo.test;
 
 import org.isisoft.morphoo.core.Morphoo;
 import org.testng.annotations.BeforeClass;

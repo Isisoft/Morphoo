@@ -1,9 +1,8 @@
 package org.isisoft.morphoo.test.unit;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.isisoft.morphoo.core.Morphoo;
 import org.isisoft.morphoo.core.Transformation;
+import org.isisoft.morphoo.test.AbstractTransformationUnitTest;
 import org.isisoft.morphoo.test.model.transformer.InjectionTransformers;
 import org.testng.annotations.Test;
 

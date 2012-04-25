@@ -18,7 +18,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.isisoft.morphoo.test.model;
+package org.isisoft.morphoo.test.model.unit;
 
 import java.util.Date;
 
