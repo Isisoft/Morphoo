@@ -31,6 +31,8 @@ class TransformerRegistry
 
    private Collection<Class<?>> registeredClasses;
 
+   private Collection<Class<?>> runtimeCollectedClasses;
+
 
    protected TransformerRegistry()
    {
@@ -42,6 +44,7 @@ class TransformerRegistry
       this.registeredPackages = new HashSet<String>();
       this.registeredClasses = new HashSet<Class<?>>();
       this.transformerGraph = new TransformerGraph();
+      this.runtimeCollectedClasses = new HashSet<Class<?>>();
       this.initialized = false;
    }
 
@@ -88,6 +91,8 @@ class TransformerRegistry
    public Transformer getTransformer(Class<?> sourceType, Class<?> targetType, Collection<String> names, boolean derive)
    {
       this.initializeIfNotReady();
+      this.processClassDeclaredTransformers(sourceType);
+      this.processClassDeclaredTransformers(targetType);
 
       return this.transformerGraph.getTransformer(sourceType, targetType, names, derive);
    }
@@ -95,6 +100,10 @@ class TransformerRegistry
    public Transformer getTransformer( Class<?> ... steps )
    {
       this.initializeIfNotReady();
+      for( Class<?> c : steps )
+      {
+         this.processClassDeclaredTransformers(c);
+      }
 
       return this.transformerGraph.getTransformer( steps );
    }
@@ -175,6 +184,28 @@ class TransformerRegistry
    private void registerTransformerMethod( Method method )
    {
       this.transformerGraph.addTransformer(method);
+   }
+
+   private void processClassDeclaredTransformers( Class<?> cls )
+   {
+      if( !this.runtimeCollectedClasses.contains( cls ) )
+      {
+         Method[] candidateTransMethods =
+               TransformerMethodAnalyzer.extractClassDeclaredTransformerCandidates( cls );
+
+         for( Method candidate : candidateTransMethods )
+         {
+            // only process those methods which either transform into or from the object class
+            if( candidate.getReturnType() == cls ||
+                (candidate.getParameterTypes().length > 0 && candidate.getParameterTypes()[0] == cls) )
+            {
+               this.registerTransformerMethod(candidate);
+            }
+         }
+
+         // cache the processed class so it's not processed again
+         this.runtimeCollectedClasses.add( cls );
+      }
    }
 
 
