@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * The Singleton registry where all transformer methods get stored. It is the framework's main storage mechanism.
+ * This class is for the framework's internal use only.
+ *
  * @author Carlos Munoz
  */
 class TransformerRegistry
@@ -39,6 +42,9 @@ class TransformerRegistry
       this.reset();
    }
 
+   /**
+    * Clears out all the registered information pertaining to transformer methods from the framework.
+    */
    public void reset()
    {
       this.registeredPackages = new HashSet<String>();
@@ -48,6 +54,9 @@ class TransformerRegistry
       this.initialized = false;
    }
 
+   /**
+    * @return The singleton instance for the registry.
+    */
    public static final TransformerRegistry getInstance()
    {
       if( instance == null )

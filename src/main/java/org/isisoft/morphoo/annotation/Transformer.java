@@ -7,11 +7,11 @@ import java.lang.annotation.Target;
 
 /**
  * Marks a method as being a transformer method.
- * Transformer methods may have either 1 or 2 arguments. The first argument must be the source object, and the
- * second one (if present) must be of type {@link org.isisoft.morphoo.core.TransformationContext}, for transformations
- * that require more information.
+ * Transformer methods must have at least one argument. The first argument must be the source object, and all others may
+ * be either context variables (annotated with {@link ContextParam}), or the TransformationContext itself, in which case
+ * it doesn't need to be annotated.
  *
- * A transformer can be named, which is useful to specify a specific transformer to use when multiple are available.
+ * A transformer can be named, which is useful to qualify a specific transformer to use when multiple are available.
  * It can also be marked as the default transformer for a source and target type. Two transformer methods for the
  * same source and target cannot be marked as default.
  *

@@ -1,6 +1,8 @@
 package org.isisoft.morphoo.core;
 
 /**
+ * Indicates a problem when performing a transformation on an instance.
+ *
  * @author Carlos Munoz
  */
 public class TransformationException extends RuntimeException

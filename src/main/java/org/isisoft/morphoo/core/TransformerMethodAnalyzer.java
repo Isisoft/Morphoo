@@ -13,6 +13,8 @@ import java.util.HashSet;
 import static org.isisoft.morphoo.core.TransformerMethod.TransformerMethodArgument;
 
 /**
+ * Utility classes to analyze transformer methods.
+ *
  * @author Carlos Munoz
  */
 public class TransformerMethodAnalyzer

@@ -3,6 +3,8 @@ package org.isisoft.morphoo.core;
 import java.util.HashSet;
 
 /**
+ * Implements a set of transformer method abstractions and adds utility methods to operate on its contents.
+ *
  * @author Carlos Munoz
  */
 public class TransformerMethodSet extends HashSet<TransformerMethod>

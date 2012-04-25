@@ -3,6 +3,8 @@ package org.isisoft.morphoo.core;
 import java.lang.reflect.Method;
 
 /**
+ * Internal abstraction of a transformer method.
+ *
  * @author Carlos Munoz
  */
 public class TransformerMethod

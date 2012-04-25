@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Internal structure to keep a relationship between transformers.
+ *
  * @author Carlos Munoz
  */
 public class TransformerGraph
@@ -31,6 +33,13 @@ public class TransformerGraph
       this.transformerMethodMap = new HashMap<DefaultEdge, TransformerMethodSet>();
    }
 
+   /**
+    * Adds a new transformer java method to the graph. The graph will analyze the method and place it in the correct
+    * place.
+    *
+    * @param transformerMethod The transformer java method that will be added to the graph.
+    * @throws InitializationException If there is a problem when adding the transformer to the graph.
+    */
    public void addTransformer( Method transformerMethod )
    {
       TransformerMethod newTrans = TransformerMethodAnalyzer.analyze(transformerMethod);
@@ -82,6 +91,19 @@ public class TransformerGraph
       edgeMethods.add(newTrans);
    }
 
+   /**
+    * Returns a transformer for the given parameters.
+    *
+    * @param from The source type of the transformer.
+    * @param to The target type that the transformer will return.
+    * @param usingNames In the case of finding multiple potential transformers between two types, this collection will
+    *                   be used to determine the transformer to use.
+    * @param includeNonDirect If true, the graph will try to determine a transformation route to get to the target type.
+    *                         Otherwise, it will only consider direct transformations.
+    * @return A transformer that satisfied the passed in conditions. Null if no such transformer can be determined
+    * @throws TransformationException If there is an unresolvable conflict when trying to determine what transformer to
+    * use.
+    */
    public Transformer getTransformer(Class<?> from, Class<?> to, Collection<String> usingNames, boolean includeNonDirect)
    {
       // Make sure the graphImpl contains both vertexes. If not, then there is no transformer
@@ -155,16 +177,44 @@ public class TransformerGraph
       }
    }
 
+   /**
+    * Returns a transformer for the given parameters. This method will only return direct transformers.
+    *
+    * @param from The source type of the transformer.
+    * @param to The target type that the transformer will return.
+    * @param usingNames In the case of finding multiple potential transformers between two types, this collection will
+    *                   be used to determine the transformer to use.
+    * @return A transformer that satisfied the passed in conditions. Null if no such transformer can be determined
+    * @throws TransformationException If there is an unresolvable conflict when trying to determine what transformer to
+    * use.
+    */
    public Transformer getTransformer(Class<?> from, Class<?> to, Collection<String> usingNames)
    {
       return this.getTransformer(from, to, usingNames, false);
    }
 
+   /**
+    * Returns a transformer for the given parameters. This method will only return direct transformers.
+    *
+    * @param from The source type of the transformer.
+    * @param to The target type that the transformer will return.
+    * @return A transformer that satisfied the passed in conditions. Null if no such transformer can be determined
+    * @throws TransformationException If there is an unresolvable conflict when trying to determine what transformer to
+    * use.
+    */
    public Transformer getTransformer(Class<?> from, Class<?> to)
    {
       return this.getTransformer(from, to, null, false);
    }
 
+   /**
+    * Returns a transformer that will go through the indicated 'step' classes.
+    *
+    * @param steps All the classes that the transformer will go through starting with the source type and ending in the
+    *              final target type.
+    * @return A transformer that will go through all the given classes before returning a target.
+    * @throws TransformationException If the graph can't find a Transformer for any of th given 'step' classes.
+    */
    public Transformer getTransformer(Class<?> ... steps)
    {
       // don't even look at a request like this

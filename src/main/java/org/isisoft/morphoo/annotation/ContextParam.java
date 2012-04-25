@@ -10,9 +10,16 @@ import java.lang.annotation.Target;
  * when performing the transformation, a {@link org.isisoft.morphoo.core.TransformationException} will be thrown
  * explicitly.
  *
- * A parameter's name must be unique when there are multiple parameters with the same or inheriting types. It is
- * recommended to always specify the name to avoid resolution conflicts. If a parameter is not annotated, it will be
- * named after the method's parameter name.
+ * A parameter's name must be unique and all variables that refer to a context variable must be decorated with this
+ * annotation.
+ *
+ * An example is:
+ * <code>
+ *    public String transformToString( Integer i, @ContextParam(name="prefix") String pre )
+ *    {
+ *       return pre + i;
+ *    }
+ * </code>
  *
  * @author Carlos Munoz
  */

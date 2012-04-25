@@ -4,6 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * The context to be used when performing a transformation. It holds name-value pairs with the different variables
+ * that should be used in the transformation using {@link Transformation#withContext(String, Object)}.
+ *
+ * It can be injected into a transformation by declaring
+ * a parameter of this type on the method. The Transformation context may be modified in a transformation, but extreme
+ * care must be taken if chaining transformation when doing this.
+ *
  * @author Carlos Munoz
  */
 public class TransformationContext

@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * annotated class; and they eventually might conflict with other transformer methods.
  *
  * This annotation provides a way to use transformers without scanning for transformer methods, but rather detecting
- * them at runtime.
+ * them on-demand.
  *
  * @author Carlos Munoz
  */
