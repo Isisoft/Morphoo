@@ -1,5 +1,6 @@
 package org.isisoft.morphoo.core;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,17 +28,17 @@ public class Transformation<T>
 
    private TransformationContext context;
 
-   private Queue<Class<?>> transformerChain;
-
    private Set<String> transformerNames;
+
+   private List<Class<?>> transformationSteps;
 
    private boolean deriveTransformation;
 
    private Transformation()
    {
       this.context = new TransformationContext();
-      this.transformerChain = new LinkedList<Class<?>>();
       this.transformerNames = new HashSet<String>(0);
+      this.transformationSteps = new ArrayList<Class<?>>();
       this.deriveTransformation = false;
    }
 
@@ -50,32 +51,7 @@ public class Transformation<T>
 
    public final T performOn( Object src )
    {
-      // If deriving is enabled, build a transformer chain right now
-      if(this.deriveTransformation)
-      {
-         this.transformerChain.clear();
-         List<Class<?>> chain = TransformerRegistry.getInstance().deriveClassTransformationChain(src.getClass(), this.targetType);
-
-         if( chain.isEmpty() )
-         {
-            throw new TransformationException("Unable to derive transformation chain from " + src.getClass().getName()
-                  + " to " + this.targetType.getName() );
-         }
-
-         this.transformerChain.addAll(chain.subList(0, chain.size()-1)); // Ignore the last element as it will be dealt with below
-      }
-
-      // perform any chained transformations
-      Class<?> toClass;
-      while( !this.transformerChain.isEmpty() )
-      {
-         toClass = this.transformerChain.poll();
-         src = this.transform(src, toClass);
-      }
-
-      // Last transformation
-      toClass = this.targetType;
-      return (T)this.transform(src, toClass);
+      return (T)this.transform(src);
    }
 
    /**
@@ -103,7 +79,7 @@ public class Transformation<T>
          throw new TransformationException("A Transformation path cannot be derived and specified simultaneously");
       }
 
-      this.transformerChain.offer(intermediateClass);
+      this.transformationSteps.add(intermediateClass);
       return this;
    }
 
@@ -161,7 +137,7 @@ public class Transformation<T>
    public Transformation<T> deriving()
    {
       // Deriving cannot be used with through at the same time
-      if( !this.transformerChain.isEmpty() )
+      if( !this.transformationSteps.isEmpty() )
       {
          throw new TransformationException("A Transformation path cannot be derived and specified simultaneously");
       }
@@ -171,33 +147,46 @@ public class Transformation<T>
    }
 
    /**
-    * Performs a one-step transformation from the src object to the targetClass.
+    * Performs the transformation from the src object to the targetClass.
     */
-   private Object transform( Object src, Class<?> targetClass )
+   private Object transform( Object src )
    {
       Transformer transformer = null;
 
-      // Try to find a named transformer if any names were supplied
-      if( !this.transformerNames.isEmpty() )
+      if( this.transformationSteps.size() > 0 )
       {
          transformer =
-               TransformerRegistry.getInstance().getTransformer(src.getClass(), targetClass, this.transformerNames);
+            TransformerRegistry.getInstance().getTransformer( this.buildTransformationSteps(src) );
       }
-      // otherwise, find it by default
       else
       {
          transformer =
-            TransformerRegistry.getInstance().getTransformer(src.getClass(), targetClass);
+               TransformerRegistry.getInstance().getTransformer(src.getClass(), this.targetType, this.transformerNames, this.deriveTransformation);
       }
 
       // If still not found then it is not registered
       if( transformer == null )
       {
          throw new TransformationException("No Transformer method found to transform from " + src.getClass().getName() +
-               " to " + targetClass.getName());
+               " to " + targetType.getName());
       }
 
       return transformer.transform(src, this.context);
+   }
+
+   private Class<?>[] buildTransformationSteps( Object src )
+   {
+      Class<?>[] stepArray = new Class<?>[ this.transformationSteps.size() + 2 ];
+      int idx = 0;
+      stepArray[idx++] = src.getClass();
+
+      for( Class<?> c : this.transformationSteps )
+      {
+         stepArray[idx++] = c;
+      }
+
+      stepArray[idx++] = targetType;
+      return stepArray;
    }
 
 }

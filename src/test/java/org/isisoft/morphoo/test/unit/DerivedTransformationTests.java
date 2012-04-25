@@ -40,8 +40,7 @@ public class DerivedTransformationTests extends AbstractTransformationUnitTest
       assertThat(finalDerivedType, equalTo(finalNonDerivedType));
    }
 
-   @Test(expectedExceptions = TransformationException.class,
-         expectedExceptionsMessageRegExp = "Unable to derive transformation chain .*")
+   @Test(expectedExceptions = TransformationException.class)
    public void derivationNotFound()
    {
       Transformation.into(Calendar.class).deriving().performOn("I am the source");

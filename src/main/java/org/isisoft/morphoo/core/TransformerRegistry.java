@@ -6,11 +6,9 @@ import org.reflections.scanners.Scanner;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -19,25 +17,19 @@ import java.util.Set;
 class TransformerRegistry
 {
 
-   private static TransformerRegistry instance;
-
-   private Reflections reflections;
-
-   private Map<TransformerKey, Transformer> transformerMap;
-
-   private Map<TransformerKey, Transformer> defaultTransformerMap;
-
    private static final Object[] DEFAULT_SCAN_HINTS = new Object[]{
          org.isisoft.morphoo.annotation.Transformer.class
    };
 
-   private Collection<String> registeredPackages;
-
-   private Collection<Class<?>> registeredClasses;
+   private static TransformerRegistry instance;
 
    private TransformerGraph transformerGraph;
 
    private boolean initialized;
+
+   private Collection<String> registeredPackages;
+
+   private Collection<Class<?>> registeredClasses;
 
 
    protected TransformerRegistry()
@@ -47,8 +39,6 @@ class TransformerRegistry
 
    public void reset()
    {
-      this.transformerMap = new HashMap<TransformerKey, Transformer>();
-      this.defaultTransformerMap = new HashMap<TransformerKey, Transformer>();
       this.registeredPackages = new HashSet<String>();
       this.registeredClasses = new HashSet<Class<?>>();
       this.transformerGraph = new TransformerGraph();
@@ -95,37 +85,18 @@ class TransformerRegistry
       }
    }
 
-   public Transformer getTransformer(Class<?> sourceType, Class<?> targetType)
+   public Transformer getTransformer(Class<?> sourceType, Class<?> targetType, Collection<String> names, boolean derive)
    {
       this.initializeIfNotReady();
 
-      TransformerKey key = new TransformerKey(sourceType, targetType);
-
-      return this.transformerMap.get(key);
+      return this.transformerGraph.getTransformer(sourceType, targetType, names, derive);
    }
 
-   public Transformer getTransformer(Class<?> sourceType, Class<?> targetType, Collection<String> names)
+   public Transformer getTransformer( Class<?> ... steps )
    {
       this.initializeIfNotReady();
 
-      for(String name : names)
-      {
-         TransformerKey key = new NamedTransformerKey(sourceType, targetType, name);
-
-         if( this.transformerMap.containsKey(key) )
-         {
-            return this.transformerMap.get(key);
-         }
-      }
-
-      return null; // did not find a transformer
-   }
-
-   public List<Class<?>> deriveClassTransformationChain(Class<?> from, Class<?> to)
-   {
-      this.initializeIfNotReady();
-
-      return this.transformerGraph.getFastestRouteToTarget(from, to);
+      return this.transformerGraph.getTransformer( steps );
    }
 
    private Object[] getReflectionScanHints()
@@ -154,14 +125,14 @@ class TransformerRegistry
    {
       if( !this.initialized )
       {
-         this.reflections =
+         Reflections reflections =
             new Reflections(
                   this.getReflectionScanHints(),
                   new Scanner[]{ new MethodAnnotationsScanner()}
             );
 
          Set<Method> transformerMethods =
-               this.reflections.getMethodsAnnotatedWith(org.isisoft.morphoo.annotation.Transformer.class);
+               reflections.getMethodsAnnotatedWith(org.isisoft.morphoo.annotation.Transformer.class);
 
          this.removeNonParticipatingMethods(transformerMethods);
 
@@ -203,78 +174,7 @@ class TransformerRegistry
 
    private void registerTransformerMethod( Method method )
    {
-      org.isisoft.morphoo.annotation.Transformer transformerAnn =
-            method.getAnnotation(org.isisoft.morphoo.annotation.Transformer.class);
-
-      if( transformerAnn == null )
-      {
-         throw new InitializationException("Method " + method.getName() + " on class "
-               + method.getDeclaringClass().getName() + " is not a transformer method but was registered as one");
-      }
-
-      // Build the transformer key
-      Class<?> sourceType;
-      Class<?> targetType = method.getReturnType();
-
-      Class<?>[] parameterTypes = method.getParameterTypes();
-
-      // return type must not be null
-      if( method.getReturnType() == Void.TYPE || method.getReturnType() == void.class )
-      {
-         throw new InitializationException("Transformer method " + method.getName() + " on class "
-               + method.getDeclaringClass().getName() + " must not return void");
-      }
-      // Must have at least one argument
-      if( parameterTypes.length == 0 )
-      {
-         throw new InitializationException("Transformer method " + method.getName() + " on class "
-               + method.getDeclaringClass().getName() + " must have at least one argument");
-      }
-
-      sourceType = parameterTypes[0];
-
-      TransformerKey transformerKey;
-
-      if( transformerAnn.name().trim().isEmpty() )
-      {
-         transformerKey = new TransformerKey(sourceType, targetType);
-      }
-      else
-      {
-         transformerKey = new NamedTransformerKey(sourceType, targetType, transformerAnn.name().trim());
-      }
-
-      // If another transformer is already registered
-      if( this.transformerMap.containsKey( transformerKey ) )
-      {
-         SimpleTransformer conflictingTransformer = (SimpleTransformer)this.transformerMap.get(transformerKey);
-
-         StringBuilder exMssg = new StringBuilder("Two transformer methods with equivalent signatures");
-         if( transformerKey instanceof NamedTransformerKey)
-         {
-            exMssg.append(" and the same name '" + ((NamedTransformerKey)transformerKey).getTransformerName() + '\'');
-         }
-         exMssg.append(" were found:");
-         exMssg.append(method.getDeclaringClass().getName() + "." + method.getName());
-         exMssg.append(" and ");
-         exMssg.append(conflictingTransformer.getTransformerMethod().getDeclaringClass().getName() + "." );
-         exMssg.append(conflictingTransformer.getTransformerMethod().getName());
-
-         throw new InitializationException(exMssg.toString());
-      }
-
-      // Store in the transformer map
-      final Transformer transformer = new SimpleTransformer(method);
-      this.transformerMap.put(transformerKey, transformer);
-
-      // store in the default transformer map if it is marked as such
-      if( transformerAnn.isDefault() )
-      {
-         this.defaultTransformerMap.put(new TransformerKey(sourceType, targetType), transformer);
-      }
-
-      // Store in the Transformer Graph
-      this.transformerGraph.addTransformerRoute(sourceType, targetType);
+      this.transformerGraph.addTransformer(method);
    }
 
 

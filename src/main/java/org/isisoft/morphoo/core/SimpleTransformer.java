@@ -1,126 +1,84 @@
 package org.isisoft.morphoo.core;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.isisoft.morphoo.annotation.ContextParam;
-
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+
+import static org.isisoft.morphoo.core.TransformerMethod.TransformerMethodArgument;
 
 /**
  * @author Carlos Munoz
  */
 public class SimpleTransformer implements Transformer
 {
-   private Method transformerMethod;
-
    private Object transformerInstance;
 
-   private String[] contextParamInjectionNames; // null means a TransformationContext goes there
+   private TransformerMethod transformerMethod;
 
 
-   public SimpleTransformer(Method transformerMethod)
+   public SimpleTransformer(TransformerMethod transformerMethod)
    {
       this.transformerMethod = transformerMethod;
-      this.analyzeTransformerMethod();
+      this.initTransformerInstance();
    }
 
-   Method getTransformerMethod()
+   private void initTransformerInstance()
    {
-      return transformerMethod;
-   }
-
-   private void analyzeTransformerMethod()
-   {
-      // Method is not static, needs an instance
-      if(!Modifier.isStatic( this.transformerMethod.getModifiers() ))
+      if( transformerMethod.isStatic() )
       {
          try
          {
-            this.transformerInstance = this.transformerMethod.getDeclaringClass().newInstance();
+            this.transformerInstance = transformerMethod.getJavaMethod().getDeclaringClass().newInstance();
          }
          catch (InstantiationException e)
          {
-            throw new InitializationException("Problem initializing transformer instance for " +
-                  this.transformerMethod.getDeclaringClass().getName() + "." +
-                  this.transformerMethod.getName(), e);
+            throw new InitializationException("Error creating new Transformer instance of class "
+                  + transformerMethod.getJavaMethod().getDeclaringClass().getName(), e);
          }
          catch (IllegalAccessException e)
          {
-            throw new InitializationException("Problem initializing transformer instance for " +
-                  this.transformerMethod.getDeclaringClass().getName() + "." +
-                  this.transformerMethod.getName(), e);
+            throw new InitializationException("Error creating new Transformer instance of class "
+                  + transformerMethod.getJavaMethod().getDeclaringClass().getName(), e);
          }
       }
-
-      // Determine the injection points
-      // first parameter is always the source object
-      Class<?>[] paramTypes = this.transformerMethod.getParameterTypes();
-      int paramCount = paramTypes.length;
-      Annotation[][] paramAnnotations = this.transformerMethod.getParameterAnnotations();
-
-      this.contextParamInjectionNames = new String[ paramCount ];
-
-      for( int i=1; i<paramCount; i++ )
+      else
       {
-         // Parameter is the TransformationContext
-         if( paramTypes[i] == TransformationContext.class )
-         {
-            this.contextParamInjectionNames[i] = null;
-         }
-         // All other parameters are treated as context variables
-         else
-         {
-            // Find the parameter annotation
-            ContextParam paramAnn = null;
-            for( Annotation a : paramAnnotations[i] )
-            {
-               if( a instanceof ContextParam )
-               {
-                  paramAnn = (ContextParam)a;
-                  break;
-               }
-            }
-
-            // anotated parameter
-            if(paramAnn != null)
-            {
-               this.contextParamInjectionNames[i] = paramAnn.name();
-            }
-            // non-annotated parameters are not allowed
-            else
-            {
-               throw new InitializationException("A parameter of type " + paramTypes[i] + " in Transformer method " +
-                     this.transformerMethod.getDeclaringClass().getName() + "." + this.transformerMethod.getName() +
-                     " has not been annotated with " + ContextParam.class.getName() + " as expected.");
-            }
-         }
+         this.transformerInstance = null;
       }
    }
 
-   private Object[] buildInvocationParameters( Object src, TransformationContext ctx )
+   private Object[] buildInvocationParameters(Object src, TransformationContext ctx)
    {
-      Object[] params = new Object[ this.transformerMethod.getParameterTypes().length ];
+      Object[] params = new Object[ transformerMethod.getArguments().length ];
 
-      int paramIdx = 0;
-
-      // first parameter is the src always
-      params[paramIdx++] = src;
-      // all others
-      while( paramIdx < params.length )
+      for( int i=0; i<transformerMethod.getArguments().length; i++ )
       {
-         // null, inject the whole Transformation context
-         if( this.contextParamInjectionNames[paramIdx] == null )
+         TransformerMethodArgument argument = transformerMethod.getArguments()[i];
+
+         // source object
+         if( argument.isSourceInstance() )
          {
-            params[paramIdx] = ctx;
+            params[i] = src;
          }
-         // not null, inject the Transformation context variable
+         // Transformation context
+         else if( argument.isTransformationContext() )
+         {
+            params[i] = ctx;
+         }
+         // It's a context variable
          else
          {
-            params[paramIdx] = ctx.get( this.contextParamInjectionNames[paramIdx] );
+            Object argValue = ctx.get( argument.getCtxVarName() );
+
+            if( !argument.isNullable() && argValue == null )
+            {
+               throw new TransformationException("Context variable " + argument.getCtxVarName() + " cannot be null " +
+                     "in Transformer method " + transformerMethod.getJavaMethod().getDeclaringClass().getName() + "." +
+                     transformerMethod.getJavaMethod().getName());
+            }
+            else
+            {
+               params[i] = argValue;
+            }
          }
-         paramIdx++;
       }
 
       return params;
@@ -132,7 +90,7 @@ public class SimpleTransformer implements Transformer
       try
       {
          Object[] params = this.buildInvocationParameters(src, ctx);
-         return this.transformerMethod.invoke(this.transformerInstance, params);
+         return this.transformerMethod.getJavaMethod().invoke(transformerInstance, params);
       }
       catch (IllegalAccessException e)
       {
