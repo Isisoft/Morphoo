@@ -1,7 +1,7 @@
 package org.isisoft.morphoo.test.unit;
 
 import org.isisoft.morphoo.core.Transformation;
-import org.isisoft.morphoo.test.AbstractTransformationUnitTest;
+import org.isisoft.morphoo.test.AbstractTransformationTest;
 import org.isisoft.morphoo.test.model.unit.SourceTypeWithTransformers;
 import org.testng.annotations.Test;
 
@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.is;
 /**
  * @author Carlos Munoz
  */
-public class DeclaredTransformerTests extends AbstractTransformationUnitTest
+public class DeclaredTransformerTests extends AbstractTransformationTest
 {
    @Override
    protected void prepareTransformationFramework()

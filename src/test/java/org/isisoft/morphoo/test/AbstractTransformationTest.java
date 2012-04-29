@@ -5,7 +5,7 @@ import org.testng.annotations.BeforeClass;
 
 /**
  */
-public abstract class AbstractTransformationUnitTest
+public abstract class AbstractTransformationTest
 {
    @BeforeClass
    public void configure()

@@ -3,11 +3,11 @@ package org.isisoft.morphoo.test.unit;
 import org.isisoft.morphoo.core.Morphoo;
 import org.isisoft.morphoo.core.Transformation;
 import org.isisoft.morphoo.core.TransformationException;
-import org.isisoft.morphoo.test.AbstractTransformationUnitTest;
+import org.isisoft.morphoo.test.AbstractTransformationTest;
+import org.isisoft.morphoo.test.model.transformer.TransformerMethods;
 import org.isisoft.morphoo.test.model.unit.FinalTargetType;
 import org.isisoft.morphoo.test.model.unit.IntermediateType;
 import org.isisoft.morphoo.test.model.unit.SourceType;
-import org.isisoft.morphoo.test.model.transformer.TransformerMethods;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.equalTo;
 /**
  * @author Carlos Munoz
  */
-public class DerivedTransformationTests extends AbstractTransformationUnitTest
+public class DerivedTransformationTests extends AbstractTransformationTest
 {
    @Override
    protected void prepareTransformationFramework()

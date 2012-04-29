@@ -6,14 +6,10 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Internal structure to keep a relationship between transformers.
@@ -124,6 +120,14 @@ public class TransformerGraph
             {
                return nonDirectTrans;
             }
+            else
+            {
+               return null;
+            }
+         }
+         else
+         {
+            return null;
          }
       }
 

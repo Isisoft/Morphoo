@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Integration Tests">
+    <test name="Full Test">
+        <packages>
+            <package name="org.isisoft.morphoo.test.integration"/>
+        </packages>
+    </test>
+</suite>

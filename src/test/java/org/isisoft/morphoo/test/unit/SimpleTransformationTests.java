@@ -2,10 +2,10 @@ package org.isisoft.morphoo.test.unit;
 
 import org.isisoft.morphoo.core.Morphoo;
 import org.isisoft.morphoo.core.Transformation;
-import org.isisoft.morphoo.test.AbstractTransformationUnitTest;
-import org.isisoft.morphoo.test.model.unit.SourceType;
+import org.isisoft.morphoo.test.AbstractTransformationTest;
 import org.isisoft.morphoo.test.model.transformer.TransformerMethods;
 import org.isisoft.morphoo.test.model.transformer.TransformerMethodsWithContext;
+import org.isisoft.morphoo.test.model.unit.SourceType;
 import org.testng.annotations.Test;
 
 import java.util.Date;
@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.is;
 /**
  * @author Carlos Munoz
  */
-public class SimpleTransformationTests extends AbstractTransformationUnitTest
+public class SimpleTransformationTests extends AbstractTransformationTest
 {
 
    @Override
